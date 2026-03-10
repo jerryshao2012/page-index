@@ -1,0 +1,92 @@
+{
+  "pdf": "/Users/jerryshao/Documents/projects/IBM/ai/page-index/tests/pdfs/earthmover.pdf",
+  "doc_name": "earthmover.pdf",
+  "model": "deepseek-r1:14b",
+  "judge_model": "deepseek-r1:14b",
+  "metrics": {
+    "total_questions": 2,
+    "correct_answers": 2,
+    "context_sufficient": 2,
+    "hallucinations": 0,
+    "accuracy": 1.0,
+    "context_sufficient_rate": 1.0,
+    "hallucination_rate": 0.0,
+    "passes_gate": true
+  },
+  "evaluations": [
+    {
+      "question": "What is the primary focus of the paper regarding EMD-based similarity search?",
+      "reference_answer": "Optimizing the refinement phase of EMD-based similarity search.",
+      "reference_evidence": "The paper focuses on optimizing the refinement phase by adapting an efficient min-cost flow algorithm, proposing a dynamic distance bound, and a dynamic refinement order with concurrent EMD refinement.",
+      "source_node_id": "0000",
+      "source_title": "Earth Mover’s Distance based Similarity Search at Scale",
+      "source_pages": [
+        1,
+        1
+      ],
+      "retrieved_context": "[Node 0000] Earth Mover’s Distance based Similarity Search at Scale (pages 1-1)\nEarth Mover’s Distance based Similarity Search at Scale\nYu Tangy, Leong Hou Uz, Yilun Caiy, Nikos Mamoulisy, Reynold Chengy\nyThe University of Hong KongzUniversity of Macau\nyfytang, ylcai, nikos, ckchengg@cs.hku.hkzryanlhu@umac.mo\nABSTRACT\nEarth Mover’s Distance (EMD), as a similarity measure, has re-\nceived a lot of attention in the ﬁelds of multimedia and probabilis-\ntic databases, computer vision, image retrieval, machine learning,\netc. EMD on multidimensional histograms provides better distin-\nguishability between the objects approximated by the histograms\n(e.g., images), compared to classic measures like Euclidean dis-\ntance. Despite its usefulness, EMD has a high computational cost;\ntherefore, a number of effective ﬁltering methods have been pro-\nposed, to reduce the pairs of histograms for which the exact EMD\nhas to be computed, during similarity search. Still, EMD calcu-\nlations in the reﬁnement step remain the bottleneck of the whole\nsimilarity search process. In this paper, we focus on optimizing the\nreﬁnement phase of EMD-based similarity search by (i) adapting\nan efﬁcient min-cost ﬂow algorithm (SIA) for EMD computation,\n(ii) proposing a dynamic distance bound, which can be used to ter-\nminate an EMD reﬁnement early, and (iii) proposing a dynamic re-\nﬁnement order for the candidates which, paired with a concurrent\nEMD reﬁnement strategy, reduces the amount of needless compu-\ntations. Our proposed techniques are orthogonal to and can be eas-\nily integrated with the state-of-the-art ﬁltering techniques, reducing\nthe cost of EMD-based similarity queries by orders of magnitude.\n1. INTRODUCTION\nGiven two histograms (e.g., probability distributions), their\nEarth Mover’s Distance (EMD) is deﬁned as the minimum amount\nof work to transform one histogram into the other. EMD is robust\nto outliers and small shifts of values among histogram bins [20],\nimproving the quality of similarity search in different domain ar-\neas, such as computer vision [19, 21], machine learning [6, 9], in-\nformation retrieval [23, 24], probabilistic [25, 32] and multimedia\ndatabases [5, 30]. Typically, the EMD between two histograms is\nmodeled and solved as a linear optimization problem, the min-cost\nﬂow problem, which requires super-cubic time. The high compu-\ntational cost of EMD restricts its applicability to datasets of low-\nscale. For example, in computer vision applications, the quality of\nresults is typically compromised by the use of low-granularity his-\ntograms, to render EMD-based similarity retrieval feasible [22,30].\nThis work is licensed under the Creative Commons Attribution-\nNonCommercial-NoDerivs 3.0 Unported License. To view a copy of this li-\ncense, visit http://creativecommons.org/licenses/by-nc-nd/3.0/. Obtain per-\nmission prior to any use beyond those covered by the license. Contact\ncopyright holder by emailing info@vldb.org. Articles from this volume\nwere invited to present their results at the 40th International Conference on\nVery Large Data Bases, September 1st - 5th 2014, Hangzhou, China.\nProceedings of the VLDB Endowment, V ol. 7, No. 4\nCopyright 2013 VLDB Endowment 2150-8097/13/12.EMD-based similarity search has been extensively studied in [5,\n25,30,32]. Given a query histogram qand a database of histogram\nobjectsD, the objective is to ﬁnd the knearest neighbors of qin\nD. All these works adopt the ﬁlter-and-reﬁnement framework; to\nevaluate a query, unpromising objects (or object groups) are ﬁl-\ntered out, by utilizing various effective EMD lower bound estima-\ntions, based on centroids and projections [7], dimensionality re-\nduction [30], primal-dual space [32], normal distributions [25], etc.\nActual EMD calculations1are applied only between qand all ob-\njects that survive the ﬁlter step. Thus, the primary focus of previous\nresearch has been in tightening the lower bounds such that more ob-\njects can be pruned at the ﬁlter step. For instance, [25] demonstrate\nthat the projection-based lower bound can be up to 90% of the ac-\ntual EMD. However, the effectiveness of a lower bound largely\ndepends on various factors, such as the dimensionality and gran-\nularity of histograms, the data distribution, and the parameters of\nthe similarity query (e.g., k). In particular, for large-scale datasets\n(e.g., 1M cardinality and/or 1K histogram dimensionality), the cur-\nrent state-of-the-art solution [25] is not feasible, due to the extreme\ncost of the reﬁnement step. For instance, based on the experiments\nin [25], it may take 10 minutes2to complete one k-NN query on a\ndataset with 1M objects even when 99% of objects are ﬁltered out.\nIn view of this, we focus on optimizing the reﬁnement phase\nof EMD-based similarity search. Calculating the EMD between\ntwo object histograms is equivalent to ﬁnding the minimum-cost\nﬂow (MCF) in a bipartite network, where each vertex indicates a\nhistogram bin and edges connect bins from different object his-\ntograms. Techniques from operations research [1], such as network\nsimplex, primal-dual, successive shortest path, and cost-scaling can\nbe used to solve MCF. However, these solutions do not scale well\nwith the number of histogram bins since their computations rely\non a complete bipartite network. For example, consider two his-\ntograms having 1K bins each, and the corresponding ﬂow graph\n(bipartite network) with 1M (1K \u00021K) edges in total. Constructing\nand using this graph for solving MCF requires high computational\nresources. To alleviate this problem, we adapt a simpliﬁed graph\nincremental algorithm (SIA), originally proposed for assignment-\njoins in spatial databases [29], which incrementally constructs the\nﬂow graph during the ﬂow calculations based on the edge weights.\nOur adaptation signiﬁcantly reduces the EMD computation time.\nMin-cost ﬂow algorithms, such as SIA, only aim at efﬁciently\nevaluating a single EMD computation but they do not exploit the\nexecution plan of EMD-based similar",
+      "selected_nodes": [
+        {
+          "node_id": "0000",
+          "title": "Earth Mover’s Distance based Similarity Search at Scale",
+          "pages": [
+            1,
+            1
+          ]
+        },
+        {
+          "node_id": "0008",
+          "title": "Analysis of EMD Calculation",
+          "pages": [
+            5,
+            6
+          ]
+        }
+      ],
+      "model_answer": "The primary focus of the paper is on optimizing the refinement phase of EMD-based similarity search to make it more efficient and scalable, particularly for large datasets. The authors aim to reduce the computational cost of the refinement step, which is a bottleneck in the process.",
+      "judgment": {
+        "context_sufficient": true,
+        "answer_correct": true,
+        "hallucination": false,
+        "explanation": "The context explicitly states that the paper focuses on optimizing the refinement phase of EMD-based similarity search. The model answer correctly identifies this as the primary focus and does not include any unsupported claims."
+      }
+    },
+    {
+      "question": "What is the main computational bottleneck in EMD-based similarity search for large datasets?",
+      "reference_answer": "The refinement step.",
+      "reference_evidence": "For large datasets, the refinement step remains the bottleneck, as even with 99% of objects filtered out, a k-NN query might take 10 minutes.",
+      "source_node_id": "0000",
+      "source_title": "Earth Mover’s Distance based Similarity Search at Scale",
+      "source_pages": [
+        1,
+        1
+      ],
+      "retrieved_context": "[Node 0000] Earth Mover’s Distance based Similarity Search at Scale (pages 1-1)\nEarth Mover’s Distance based Similarity Search at Scale\nYu Tangy, Leong Hou Uz, Yilun Caiy, Nikos Mamoulisy, Reynold Chengy\nyThe University of Hong KongzUniversity of Macau\nyfytang, ylcai, nikos, ckchengg@cs.hku.hkzryanlhu@umac.mo\nABSTRACT\nEarth Mover’s Distance (EMD), as a similarity measure, has re-\nceived a lot of attention in the ﬁelds of multimedia and probabilis-\ntic databases, computer vision, image retrieval, machine learning,\netc. EMD on multidimensional histograms provides better distin-\nguishability between the objects approximated by the histograms\n(e.g., images), compared to classic measures like Euclidean dis-\ntance. Despite its usefulness, EMD has a high computational cost;\ntherefore, a number of effective ﬁltering methods have been pro-\nposed, to reduce the pairs of histograms for which the exact EMD\nhas to be computed, during similarity search. Still, EMD calcu-\nlations in the reﬁnement step remain the bottleneck of the whole\nsimilarity search process. In this paper, we focus on optimizing the\nreﬁnement phase of EMD-based similarity search by (i) adapting\nan efﬁcient min-cost ﬂow algorithm (SIA) for EMD computation,\n(ii) proposing a dynamic distance bound, which can be used to ter-\nminate an EMD reﬁnement early, and (iii) proposing a dynamic re-\nﬁnement order for the candidates which, paired with a concurrent\nEMD reﬁnement strategy, reduces the amount of needless compu-\ntations. Our proposed techniques are orthogonal to and can be eas-\nily integrated with the state-of-the-art ﬁltering techniques, reducing\nthe cost of EMD-based similarity queries by orders of magnitude.\n1. INTRODUCTION\nGiven two histograms (e.g., probability distributions), their\nEarth Mover’s Distance (EMD) is deﬁned as the minimum amount\nof work to transform one histogram into the other. EMD is robust\nto outliers and small shifts of values among histogram bins [20],\nimproving the quality of similarity search in different domain ar-\neas, such as computer vision [19, 21], machine learning [6, 9], in-\nformation retrieval [23, 24], probabilistic [25, 32] and multimedia\ndatabases [5, 30]. Typically, the EMD between two histograms is\nmodeled and solved as a linear optimization problem, the min-cost\nﬂow problem, which requires super-cubic time. The high compu-\ntational cost of EMD restricts its applicability to datasets of low-\nscale. For example, in computer vision applications, the quality of\nresults is typically compromised by the use of low-granularity his-\ntograms, to render EMD-based similarity retrieval feasible [22,30].\nThis work is licensed under the Creative Commons Attribution-\nNonCommercial-NoDerivs 3.0 Unported License. To view a copy of this li-\ncense, visit http://creativecommons.org/licenses/by-nc-nd/3.0/. Obtain per-\nmission prior to any use beyond those covered by the license. Contact\ncopyright holder by emailing info@vldb.org. Articles from this volume\nwere invited to present their results at the 40th International Conference on\nVery Large Data Bases, September 1st - 5th 2014, Hangzhou, China.\nProceedings of the VLDB Endowment, V ol. 7, No. 4\nCopyright 2013 VLDB Endowment 2150-8097/13/12.EMD-based similarity search has been extensively studied in [5,\n25,30,32]. Given a query histogram qand a database of histogram\nobjectsD, the objective is to ﬁnd the knearest neighbors of qin\nD. All these works adopt the ﬁlter-and-reﬁnement framework; to\nevaluate a query, unpromising objects (or object groups) are ﬁl-\ntered out, by utilizing various effective EMD lower bound estima-\ntions, based on centroids and projections [7], dimensionality re-\nduction [30], primal-dual space [32], normal distributions [25], etc.\nActual EMD calculations1are applied only between qand all ob-\njects that survive the ﬁlter step. Thus, the primary focus of previous\nresearch has been in tightening the lower bounds such that more ob-\njects can be pruned at the ﬁlter step. For instance, [25] demonstrate\nthat the projection-based lower bound can be up to 90% of the ac-\ntual EMD. However, the effectiveness of a lower bound largely\ndepends on various factors, such as the dimensionality and gran-\nularity of histograms, the data distribution, and the parameters of\nthe similarity query (e.g., k). In particular, for large-scale datasets\n(e.g., 1M cardinality and/or 1K histogram dimensionality), the cur-\nrent state-of-the-art solution [25] is not feasible, due to the extreme\ncost of the reﬁnement step. For instance, based on the experiments\nin [25], it may take 10 minutes2to complete one k-NN query on a\ndataset with 1M objects even when 99% of objects are ﬁltered out.\nIn view of this, we focus on optimizing the reﬁnement phase\nof EMD-based similarity search. Calculating the EMD between\ntwo object histograms is equivalent to ﬁnding the minimum-cost\nﬂow (MCF) in a bipartite network, where each vertex indicates a\nhistogram bin and edges connect bins from different object his-\ntograms. Techniques from operations research [1], such as network\nsimplex, primal-dual, successive shortest path, and cost-scaling can\nbe used to solve MCF. However, these solutions do not scale well\nwith the number of histogram bins since their computations rely\non a complete bipartite network. For example, consider two his-\ntograms having 1K bins each, and the corresponding ﬂow graph\n(bipartite network) with 1M (1K \u00021K) edges in total. Constructing\nand using this graph for solving MCF requires high computational\nresources. To alleviate this problem, we adapt a simpliﬁed graph\nincremental algorithm (SIA), originally proposed for assignment-\njoins in spatial databases [29], which incrementally constructs the\nﬂow graph during the ﬂow calculations based on the edge weights.\nOur adaptation signiﬁcantly reduces the EMD computation time.\nMin-cost ﬂow algorithms, such as SIA, only aim at efﬁciently\nevaluating a single EMD computation but they do not exploit the\nexecution plan of EMD-based similar",
+      "selected_nodes": [
+        {
+          "node_id": "0000",
+          "title": "Earth Mover’s Distance based Similarity Search at Scale",
+          "pages": [
+            1,
+            1
+          ]
+        },
+        {
+          "node_id": "0008",
+          "title": "Analysis of EMD Calculation",
+          "pages": [
+            5,
+            6
+          ]
+        }
+      ],
+      "model_answer": "The main computational bottleneck in EMD-based similarity search for large datasets is the refinement phase, where exact EMD calculations are performed on the remaining candidates after filtering. This step is computationally expensive due to the high dimensionality and large number of objects, making it the primary challenge in scaling EMD-based methods.",
+      "judgment": {
+        "context_sufficient": true,
+        "answer_correct": true,
+        "hallucination": false,
+        "explanation": "The context explicitly states that the refinement step is the main computational bottleneck in EMD-based similarity search for large datasets. The model answer correctly identifies this bottleneck and explains it accurately without introducing any unsupported claims."
+      }
+    }
+  ]
+}

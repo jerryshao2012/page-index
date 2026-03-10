@@ -1,4 +1,10 @@
-import tiktoken
+
+# tiktoken is only required for token counting; make its import optional so
+# demos that only question the model can run without installing it.
+try:
+    import tiktoken
+except ImportError:
+    tiktoken = None
 import openai
 import logging
 import os
@@ -19,16 +25,40 @@ from types import SimpleNamespace as config
 
 CHATGPT_API_KEY = os.getenv("CHATGPT_API_KEY")
 
+
+def _resolve_client_config(api_key=None):
+    """
+    Build OpenAI-compatible client config.
+    Supports OpenAI defaults and local providers like Ollama via base_url.
+    """
+    resolved_api_key = api_key or CHATGPT_API_KEY or os.getenv("OPENAI_API_KEY")
+    base_url = os.getenv("PAGEINDEX_API_BASE_URL") or os.getenv("OPENAI_BASE_URL")
+
+    # Ollama's OpenAI-compatible endpoint accepts any non-empty key.
+    if not resolved_api_key and base_url:
+        resolved_api_key = "ollama"
+
+    client_kwargs = {}
+    if resolved_api_key:
+        client_kwargs["api_key"] = resolved_api_key
+    if base_url:
+        client_kwargs["base_url"] = base_url
+    return client_kwargs
+
 def count_tokens(text, model=None):
     if not text:
         return 0
-    enc = tiktoken.encoding_for_model(model)
+    try:
+        enc = tiktoken.encoding_for_model(model) if model else tiktoken.get_encoding("cl100k_base")
+    except KeyError:
+        # Fallback for local/custom model names, e.g. Ollama models.
+        enc = tiktoken.get_encoding("cl100k_base")
     tokens = enc.encode(text)
     return len(tokens)
 
 def ChatGPT_API_with_finish_reason(model, prompt, api_key=CHATGPT_API_KEY, chat_history=None):
     max_retries = 10
-    client = openai.OpenAI(api_key=api_key)
+    client = openai.OpenAI(**_resolve_client_config(api_key))
     for i in range(max_retries):
         try:
             if chat_history:
@@ -60,7 +90,7 @@ def ChatGPT_API_with_finish_reason(model, prompt, api_key=CHATGPT_API_KEY, chat_
 
 def ChatGPT_API(model, prompt, api_key=CHATGPT_API_KEY, chat_history=None):
     max_retries = 10
-    client = openai.OpenAI(api_key=api_key)
+    client = openai.OpenAI(**_resolve_client_config(api_key))
     for i in range(max_retries):
         try:
             if chat_history:
@@ -91,7 +121,7 @@ async def ChatGPT_API_async(model, prompt, api_key=CHATGPT_API_KEY):
     messages = [{"role": "user", "content": prompt}]
     for i in range(max_retries):
         try:
-            async with openai.AsyncOpenAI(api_key=api_key) as client:
+            async with openai.AsyncOpenAI(**_resolve_client_config(api_key)) as client:
                 response = await client.chat.completions.create(
                     model=model,
                     messages=messages,
@@ -411,7 +441,10 @@ def add_preface_if_needed(data):
 
 
 def get_page_tokens(pdf_path, model="gpt-4o-2024-11-20", pdf_parser="PyPDF2"):
-    enc = tiktoken.encoding_for_model(model)
+    try:
+        enc = tiktoken.encoding_for_model(model)
+    except KeyError:
+        enc = tiktoken.get_encoding("cl100k_base")
     if pdf_parser == "PyPDF2":
         pdf_reader = PyPDF2.PdfReader(pdf_path)
         page_list = []

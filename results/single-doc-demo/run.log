@@ -1,0 +1,91 @@
+python demo_ollama.py \
+  --pdf tests/pdfs/earthmover.pdf \
+  --model deepseek-r1:14b \
+  --questions 50 \
+  --force-reindex
+PDF: /tests/pdfs/earthmover.pdf
+Model: deepseek-r1:14b
+Judge model: deepseek-r1:14b
+Output directory: /results/single-doc-demo
+
+Step 1/4: building or loading the PageIndex tree...
+Parsing PDF...
+start find_toc_pages
+toc found
+start detect_page_index
+start find_toc_pages
+start detect_page_index
+index not found
+process_no_toc
+start_index: 1
+divide page_list to groups 2
+start generate_toc_init
+start generate_toc_continue
+Document validation: 12 pages, max allowed index: 12
+start verify_toc
+check all items
+accuracy: 45.45%
+Fresh indexing failed. Falling back to bundled structure from tests/results for earthmover.pdf. Original error: Processing failed
+Candidate nodes for QA generation: 15
+Step 2/4: generating grounded questions from indexed nodes...
+Generated 50 questions
+Step 3/4: retrieving context and answering each question...
+  [01/50] correct=True context=True hallucination=False
+  [02/50] correct=True context=True hallucination=False
+  [03/50] correct=True context=True hallucination=False
+  [04/50] correct=True context=False hallucination=False
+  [05/50] correct=True context=True hallucination=False
+  [06/50] correct=True context=True hallucination=False
+  [07/50] correct=True context=True hallucination=False
+  [08/50] correct=True context=True hallucination=False
+  [09/50] correct=True context=True hallucination=False
+  [10/50] correct=True context=True hallucination=False
+  [11/50] correct=True context=True hallucination=False
+  [12/50] correct=True context=True hallucination=False
+  [13/50] correct=True context=True hallucination=False
+  [14/50] correct=True context=True hallucination=False
+  [15/50] correct=True context=True hallucination=False
+  [16/50] correct=True context=True hallucination=False
+  [17/50] correct=True context=True hallucination=False
+  [18/50] correct=True context=True hallucination=False
+  [19/50] correct=True context=True hallucination=False
+  [20/50] correct=False context=False hallucination=False
+  [21/50] correct=True context=True hallucination=False
+  [22/50] correct=True context=True hallucination=False
+  [23/50] correct=True context=True hallucination=False
+  [24/50] correct=True context=True hallucination=False
+  [25/50] correct=True context=True hallucination=False
+  [26/50] correct=True context=True hallucination=False
+  [27/50] correct=False context=False hallucination=True
+  [28/50] correct=False context=False hallucination=False
+  [29/50] correct=True context=True hallucination=False
+  [30/50] correct=False context=False hallucination=True
+  [31/50] correct=True context=True hallucination=False
+  [32/50] correct=False context=False hallucination=False
+  [33/50] correct=True context=True hallucination=False
+  [34/50] correct=True context=True hallucination=False
+  [35/50] correct=False context=True hallucination=False
+  [36/50] correct=True context=False hallucination=True
+  [37/50] correct=True context=True hallucination=False
+  [38/50] correct=True context=True hallucination=False
+  [39/50] correct=True context=True hallucination=False
+  [40/50] correct=True context=False hallucination=False
+  [41/50] correct=True context=True hallucination=False
+  [42/50] correct=True context=True hallucination=False
+  [43/50] correct=False context=True hallucination=False
+  [44/50] correct=True context=True hallucination=False
+  [45/50] correct=True context=True hallucination=False
+  [46/50] correct=True context=False hallucination=False
+  [47/50] correct=True context=False hallucination=False
+  [48/50] correct=True context=True hallucination=False
+  [49/50] correct=True context=True hallucination=False
+  [50/50] correct=True context=True hallucination=False
+Step 4/4: aggregating evaluation metrics...
+
+Evaluation complete.
+Accuracy: 86.00%
+Hallucination rate: 6.00%
+Passes 98% / zero-hallucination gate: False
+Question set: /results/single-doc-demo/earthmover_synthetic_questions.json
+Report JSON: /results/single-doc-demo/earthmover_evaluation_report.json
+Report MD: /results/single-doc-demo/earthmover_evaluation_report.md

@@ -1,0 +1,552 @@
+[
+  {
+    "question": "What is the primary computational model used to calculate EMD between two histograms?",
+    "reference_answer": "The minimum-cost flow (MCF) problem in a bipartite network.",
+    "reference_evidence": "EMD between two histograms is modeled and solved as a linear optimization problem, the min-cost flow problem.",
+    "source_node_id": "0000",
+    "source_title": "Earth Mover’s Distance based Similarity Search at Scale",
+    "source_pages": [
+      1,
+      1
+    ]
+  },
+  {
+    "question": "What are the three main contributions proposed in the paper to optimize the refinement phase of EMD-based similarity search?",
+    "reference_answer": "Adapting an efficient min-cost flow algorithm (SIA), proposing a dynamic distance bound, and proposing a dynamic refinement order with a concurrent strategy.",
+    "reference_evidence": "Our proposed techniques are orthogonal to and can be easily integrated with the state-of-the-art ﬁltering techniques, reducing the cost of EMD-based similarity queries by orders of magnitude.",
+    "source_node_id": "0000",
+    "source_title": "Earth Mover’s Distance based Similarity Search at Scale",
+    "source_pages": [
+      1,
+      1
+    ]
+  },
+  {
+    "question": "Why is the current state-of-the-art solution not feasible for large datasets?",
+    "reference_answer": "Due to the extreme cost of the refinement step.",
+    "reference_evidence": "For large-scale datasets (e.g., 1M cardinality and/or 1K histogram dimensionality), the current state-of-the-art solution [25] is not feasible, due to the extreme cost of the reﬁnement step.",
+    "source_node_id": "0000",
+    "source_title": "Earth Mover’s Distance based Similarity Search at Scale",
+    "source_pages": [
+      1,
+      1
+    ]
+  },
+  {
+    "question": "What is the time taken for a k-NN query on a dataset with 1M objects even when 99% of objects are filtered out?",
+    "reference_answer": "It may take 10 minutes.",
+    "reference_evidence": "Based on the experiments in [25], it may take 10 minutes to complete one k-NN query on a dataset with 1M objects even when 99% of objects are ﬁltered out.",
+    "source_node_id": "0000",
+    "source_title": "Earth Mover’s Distance based Similarity Search at Scale",
+    "source_pages": [
+      1,
+      1
+    ]
+  },
+  {
+    "question": "What is the main focus of the paper regarding EMD-based similarity search?",
+    "reference_answer": "Optimizing the refinement phase of EMD-based similarity search.",
+    "reference_evidence": "In this paper, we focus on optimizing the reﬁnement phase of EMD-based similarity search by (i) adapting an efﬁcient min-cost ﬂow algorithm (SIA) for EMD computation, (ii) proposing a dynamic distance bound, which can be used to terminate an EMD reﬁnement early, and (iii) proposing a dynamic reﬁnement order for the candidates which, paired with a concurrent EMD reﬁnement strategy, reduces the amount of needless compu- tations.",
+    "source_node_id": "0002",
+    "source_title": "INTRODUCTION",
+    "source_pages": [
+      1,
+      2
+    ]
+  },
+  {
+    "question": "What challenge does EMD face due to its computational cost?",
+    "reference_answer": "High computational cost restricts its applicability to low-scale datasets.",
+    "reference_evidence": "The high computational cost of EMD restricts its applicability to datasets of low-scale.",
+    "source_node_id": "0002",
+    "source_title": "INTRODUCTION",
+    "source_pages": [
+      1,
+      2
+    ]
+  },
+  {
+    "question": "What is the bottleneck in the similarity search process as mentioned in the paper?",
+    "reference_answer": "The bottleneck is the EMD calculations in the refinement step.",
+    "reference_evidence": "EMD calcu- lations in the reﬁnement step remain the bottleneck of the whole similarity search process.",
+    "source_node_id": "0002",
+    "source_title": "INTRODUCTION",
+    "source_pages": [
+      1,
+      2
+    ]
+  },
+  {
+    "question": "What example is given about the time taken for a k-NN query on a large dataset?",
+    "reference_answer": "It takes 10 minutes to complete a k-NN query on a dataset with 1M objects.",
+    "reference_evidence": "based on the experiments in [25], it may take 10 minutes2to complete one k-NN query on a dataset with 1M objects even when 99% of objects are ﬁltered out.",
+    "source_node_id": "0002",
+    "source_title": "INTRODUCTION",
+    "source_pages": [
+      1,
+      2
+    ]
+  },
+  {
+    "question": "What is the cost of a physical edge in the flow graph?",
+    "reference_answer": "The cost of a physical edge e(qi, pj) is given by the cost matrix C, i.e., cf(qi, pj) = ci,j.",
+    "reference_evidence": "The cost of a physical edge e(qi;pj)iscf(qi;pj) =ci,j, while the cost of a non-physical (reverse) edge e(pj;qi)iscf(pj;qi) =−ci,j.",
+    "source_node_id": "0004",
+    "source_title": "Computing the EMD",
+    "source_pages": [
+      3,
+      3
+    ]
+  },
+  {
+    "question": "What is the cost of a reverse edge in the flow graph?",
+    "reference_answer": "The cost of a reverse edge e(pj, qi) is the negative of the corresponding physical edge's cost, i.e., cf(pj, qi) = −ci,j.",
+    "reference_evidence": "The cost of a physical edge e(qi;pj)iscf(qi;pj) =ci,j, while the cost of a non-physical (reverse) edge e(pj;qi)iscf(pj;qi) =−ci,j.",
+    "source_node_id": "0004",
+    "source_title": "Computing the EMD",
+    "source_pages": [
+      3,
+      3
+    ]
+  },
+  {
+    "question": "How is the capacity of a reverse edge determined?",
+    "reference_answer": "The capacity of a reverse edge e(pj, qi) is equal to the current flow on the corresponding physical edge e(qi, pj).",
+    "reference_evidence": "The capacity of a non-physical edge (i.e., reverse edge) e(pj;qi)always equals to the ﬂow fi;jcurrently on edgee(qi;pj).",
+    "source_node_id": "0004",
+    "source_title": "Computing the EMD",
+    "source_pages": [
+      3,
+      3
+    ]
+  },
+  {
+    "question": "What is the time complexity of the SSP algorithm for computing EMD?",
+    "reference_answer": "The time complexity is O(F * |E| * log |V|), where F is the total number of flow units to be augmented.",
+    "reference_evidence": "Computing the EMD, using SSP requires O(FjEjlogjVj)time, whereFis the total number of שּׁows we need to augment andO(jEjlogjVj)is the cost of a shortest path search on a bipartite graph withjVjvertices andjEjedges.",
+    "source_node_id": "0004",
+    "source_title": "Computing the EMD",
+    "source_pages": [
+      3,
+      3
+    ]
+  },
+  {
+    "question": "What structure is used to model the computation of EMD as a network flow problem?",
+    "reference_answer": "A bipartite flow network.",
+    "reference_evidence": "We ﬁrst construct a bipartite ﬂow network (see Figure 2(a) for the ex-ample of Figure 1), where the vertices are derived from the his-togram bins (e.g., music genres) and the edges connect the bins between the two histograms.",
+    "source_node_id": "0005",
+    "source_title": "Filter-and-Refinement Framework",
+    "source_pages": [
+      3,
+      4
+    ]
+  },
+  {
+    "question": "How are the flow capacities of the vertices in the bipartite network determined?",
+    "reference_answer": "The flow capacity of each vertex corresponds to the value of the corresponding histogram bin.",
+    "reference_evidence": "The ﬂow capacity of vertex q1(i.e., R&B ofq) in Figure 2(a) is set to 3 according to Figure 1(a).",
+    "source_node_id": "0005",
+    "source_title": "Filter-and-Refinement Framework",
+    "source_pages": [
+      3,
+      4
+    ]
+  },
+  {
+    "question": "What algorithm is used to compute the minimum-cost flow in the bipartite graph?",
+    "reference_answer": "The Successive Shortest Path (SSP) algorithm.",
+    "reference_evidence": "The successive shortest path (SSP) algorithm [1] is the most representative algorithm in the category of the network ﬂow based so-lutions.",
+    "source_node_id": "0005",
+    "source_title": "Filter-and-Refinement Framework",
+    "source_pages": [
+      3,
+      4
+    ]
+  },
+  {
+    "question": "What defines a feasible edge in the context of the network flow algorithm?",
+    "reference_answer": "A physical edge is feasible if its flow is less than its capacity, and a reverse edge is feasible if its flow is greater than zero.",
+    "reference_evidence": "DEFINITION 1 (F EASIBLE EDGE).Given a ﬂow graph, a physical edge e(qi;pj)is feasible if fi;j<cap i;j; a non-physical (reverse) edge e(pj;qi)is feasible if fi;j>0.",
+    "source_node_id": "0005",
+    "source_title": "Filter-and-Refinement Framework",
+    "source_pages": [
+      3,
+      4
+    ]
+  },
+  {
+    "question": "What is the purpose of the partial graph G0 in SIA?",
+    "reference_answer": "To reduce the search cost by constructing a smaller graph incrementally.",
+    "reference_evidence": "We use the running example (cf. Figure 2) to demonstrate the superiority of SIA in Figure 5. Recall that the min-cost feasible path starting at q1(cf. Figure 2(c)) is q1!p3!q2!p4 in the complete graph G. Suppose a partial graph G0is constructed based on the seen values in the partial cost matrix (Figure 5(b)), the same min-cost feasible path can be found in G0as well. Thereby, augmenting this path in G0is equivalent to the augmentation in G which returns the same result in Figure 2(b).",
+    "source_node_id": "0006",
+    "source_title": "SCALING UP SSP",
+    "source_pages": [
+      4,
+      5
+    ]
+  },
+  {
+    "question": "How does SIA ensure that the min-cost feasible paths in G and G0are equivalent?",
+    "reference_answer": "By using a distance bound checking where the bound  is derived from the edges not yet inserted into G0.",
+    "reference_evidence": "The min-cost feasible paths in GandG0are equivalent. This is done by a distance bound checking where the bound  is derived from the edges not yet inserted into G0. As an intuition, if the edges in G0are inserted incrementally in ascending order to their costs at every vertex, it is possible that the min-cost path in G0is cheaper than all feasible paths which include edges not in G0.",
+    "source_node_id": "0006",
+    "source_title": "SCALING UP SSP",
+    "source_pages": [
+      4,
+      5
+    ]
+  },
+  {
+    "question": "What algorithm is used in SIA to find the min-cost feasible path in G0?",
+    "reference_answer": "Dijkstra's shortest path algorithm.",
+    "reference_evidence": "Algorithm 2 is a pseudocode of SIA for EMD calculations. At each iteration, SIA searches the min-cost feasible path spusing Dijkstra’s shortest path algorithm [1] in G0from any feasible vertex (line 3), i.e., a vertex of qwith remaining capacity.5If the cost of spdoes not exceed the distance bound  (line 4), then it must be a valid min-cost feasible path in the entire graph G. We augment the ﬂow ofspifspis valid (line 8). Otherwise, G0is essentially expanded by adding more edges from G(line 5) and the distance bound  is updated accordingly (line 6).",
+    "source_node_id": "0006",
+    "source_title": "SCALING UP SSP",
+    "source_pages": [
+      4,
+      5
+    ]
+  },
+  {
+    "question": "What happens when the cost of sp exceeds the distance bound   in SIA?",
+    "reference_answer": "G0is expanded by adding more edges, and the bound  is updated.",
+    "reference_evidence": "If the cost of spdoes not exceed the distance bound  (line 4), then it must be a valid min-cost feasible path in the entire graph G. We augment the ﬂow ofspifspis valid (line 8). Otherwise, G0is essentially expanded by adding more edges from G(line 5) and the distance bound  is updated accordingly (line 6).",
+    "source_node_id": "0006",
+    "source_title": "SCALING UP SSP",
+    "source_pages": [
+      4,
+      5
+    ]
+  },
+  {
+    "question": "What percentage of SIA's execution time is used in the last 20% of its iterations for a typical EMD calculation?",
+    "reference_answer": "Over 90%",
+    "reference_evidence": "This example shows that over 90% of SIA’s execution time is used in the last 20% of its iterations.",
+    "source_node_id": "0008",
+    "source_title": "Analysis of EMD Calculation",
+    "source_pages": [
+      5,
+      6
+    ]
+  },
+  {
+    "question": "What two techniques are proposed to boost the performance of the refinement phase during EMD-based similarity search?",
+    "reference_answer": "Progressive Bounding (PB) and Dynamic Refinement Ordering (DRO)",
+    "reference_evidence": "We propose two novel techniques, progressive bounding (PB) and dynamic reﬁnement ordering (DRO), which boost the performance of the reﬁnement phase during EMD-based similarity search.",
+    "source_node_id": "0008",
+    "source_title": "Analysis of EMD Calculation",
+    "source_pages": [
+      5,
+      6
+    ]
+  },
+  {
+    "question": "Why does the runtime of SIA increase quickly as the algorithm progresses?",
+    "reference_answer": "Because the partial graph G0 and the number of feasible edges grow, making shortest path searches more expensive.",
+    "reference_evidence": "This analysis shows that there is room for greatly improving the reﬁnement phase of EMD-based similarity search, if SIA can be terminated before reaching its late iterations. The reason behind this is that as SIA progresses, the partial graph G0 and the number of feasible edges grow and shortest path searches become much more expensive.",
+    "source_node_id": "0008",
+    "source_title": "Analysis of EMD Calculation",
+    "source_pages": [
+      5,
+      6
+    ]
+  },
+  {
+    "question": "At what point can SIA terminate early during an EMD calculation?",
+    "reference_answer": "When the running lower bound becomes not smaller than the current pruning threshold.",
+    "reference_evidence": "SIA, for a specific reﬁnement, can terminate early if the running lower bound becomes not smaller than the current pruning threshold  (i.e., the k-th lowest EMD found so far).",
+    "source_node_id": "0008",
+    "source_title": "Analysis of EMD Calculation",
+    "source_pages": [
+      5,
+      6
+    ]
+  },
+  {
+    "question": "What percentage of iterations does it take for emd_ to reach the pruning threshold in the example?",
+    "reference_answer": "61%",
+    "reference_evidence": "In this example, the running lower bound emd_ reaches the pruning threshold  after augmenting 61% iterations which take only 2.84% of the total execution time.",
+    "source_node_id": "0009",
+    "source_title": "Progressive Bounding",
+    "source_pages": [
+      6,
+      6
+    ]
+  },
+  {
+    "question": "What is the key property established by Lemma 1 regarding the costs of feasible paths?",
+    "reference_answer": "The costs of the minimum-cost feasible paths from any node qi are monotonically non-decreasing.",
+    "reference_evidence": "Lemma 1 shows that the costs of the minimum-cost feasible paths being augmented from a vertex are monotonically non-decreasing.",
+    "source_node_id": "0009",
+    "source_title": "Progressive Bounding",
+    "source_pages": [
+      6,
+      6
+    ]
+  },
+  {
+    "question": "How is the running lower bound emd_ computed according to Definition 3?",
+    "reference_answer": "emd_ is computed by adding the current cost and an estimated cost based on the remaining flow capacities of each node.",
+    "reference_evidence": "The running lower bound emd_ is deﬁned as X qi2q mi X j=1 cf(spqi;j)   f(spqi;j) + (current cost) X qi2q cf(spqi;mi)   (cap qi  fqi).",
+    "source_node_id": "0009",
+    "source_title": "Progressive Bounding",
+    "source_pages": [
+      6,
+      6
+    ]
+  },
+  {
+    "question": "What is the value of emd_ in the example provided in Table 2?",
+    "reference_answer": "1.8",
+    "reference_evidence": "Using Deﬁnition 3, we can compute emd_ by adding to current cost an estimated lower bound for all remaining feasible paths originating at each vertex qi, based on the node’s remaining capacity (i.e., cap qi  fqi) and the cost of the last augmented feasible path from qi. [...] emd_ is 1.8 which is much tighter compared to just using the current cost as the lower bound.",
+    "source_node_id": "0009",
+    "source_title": "Progressive Bounding",
+    "source_pages": [
+      6,
+      6
+    ]
+  },
+  {
+    "question": "What percentage of iterations does emd reach the pruning threshold in the example?",
+    "reference_answer": "61%",
+    "reference_evidence": "In this example, the running lower bound emd reaches the pruning threshold after augmenting 61% iterations.",
+    "source_node_id": "0010",
+    "source_title": "Sensitivity to Refinement Order",
+    "source_pages": [
+      6,
+      7
+    ]
+  },
+  {
+    "question": "What is the time taken for emd to reach the pruning threshold in the example?",
+    "reference_answer": "2.84% of the total execution time",
+    "reference_evidence": "which take only 2.84% of the total execution time.",
+    "source_node_id": "0010",
+    "source_title": "Sensitivity to Refinement Order",
+    "source_pages": [
+      6,
+      7
+    ]
+  },
+  {
+    "question": "What is the value of emd in the example provided?",
+    "reference_answer": "1.8",
+    "reference_evidence": "Thereby, emd is 1.8 which is much tighter compared to just using the current cost as the lower bound.",
+    "source_node_id": "0010",
+    "source_title": "Sensitivity to Refinement Order",
+    "source_pages": [
+      6,
+      7
+    ]
+  },
+  {
+    "question": "How much time does updating emd take during each iteration of SIA?",
+    "reference_answer": "O(1) time",
+    "reference_evidence": "the update of emd takes O(1) time.",
+    "source_node_id": "0010",
+    "source_title": "Sensitivity to Refinement Order",
+    "source_pages": [
+      6,
+      7
+    ]
+  },
+  {
+    "question": "What is the main goal of the Dynamic Refinement Ordering (DRO) approach?",
+    "reference_answer": "To refine multiple candidates concurrently during EMD-based similarity search.",
+    "reference_evidence": "The main idea behind our dynamic reﬁnement ordering (DRO) approach in reﬁning candidates during EMD-based similarity search is to conduct the reﬁnement for multiple candidates concurrently.",
+    "source_node_id": "0011",
+    "source_title": "Dynamic Refinement Ordering",
+    "source_pages": [
+      7,
+      8
+    ]
+  },
+  {
+    "question": "How is the priority queue (PL) ordered in the DRO approach?",
+    "reference_answer": "The priority queue is ordered based on the smallest emd_ value of the objects.",
+    "reference_evidence": "At each iteration, DRO de-heaps the top object p in PL and progressively refines the current emd(q; p) by iteratively augmenting shortest paths while emd_p is still smaller than PL:top():emd_ (i.e., the smallest emd_ in PL).",
+    "source_node_id": "0011",
+    "source_title": "Dynamic Refinement Ordering",
+    "source_pages": [
+      7,
+      8
+    ]
+  },
+  {
+    "question": "What happens when an object's emd_ exceeds the pruning threshold  ?",
+    "reference_answer": "The object is pruned and replaced by another candidate from the filter phase.",
+    "reference_evidence": "If emd_p >=  , then the current object p is pruned because in the best case it cannot become better than the current k nearest neighbors; DRO calls function getnextfilter to add another candidate in PL in place of p.",
+    "source_node_id": "0011",
+    "source_title": "Dynamic Refinement Ordering",
+    "source_pages": [
+      7,
+      8
+    ]
+  },
+  {
+    "question": "What is the initial size of the priority queue (PL) in the DRO approach?",
+    "reference_answer": "The initial size of PL is determined by calling the getnextfilter function b times.",
+    "reference_evidence": "First, DRO calls this function b times to form the initial PL. PL is stored as a priority queue, in which the top element is the object with the smallest emd_.",
+    "source_node_id": "0011",
+    "source_title": "Dynamic Refinement Ordering",
+    "source_pages": [
+      7,
+      8
+    ]
+  },
+  {
+    "question": "What is the running upper bound emd+ for an object p?",
+    "reference_answer": "The running upper bound emd+ is defined as the sum of the current cost and the maximum flow cost of the remaining capacities in the flow network.",
+    "reference_evidence": "Consider a flow graph, such that for each node pi2p, there is a set of miaugmented paths spqi;1;:::;sp qi;mi. The running upper bound emd+ is defined as emd+=X qi2qmiX j=1cf(spqi;j) f(spqi;j) + (current cost) maxflow (q;p), where maxflow (q;p) returns the cost of a maximum flow based on the remaining capacities of q and p.",
+    "source_node_id": "0012",
+    "source_title": "Running Upper Bound",
+    "source_pages": [
+      8,
+      8
+    ]
+  },
+  {
+    "question": "What algorithm is used to compute the running upper bound emd+ efficiently?",
+    "reference_answer": "The GreedyUB algorithm is used, which augments flow along edges in increasing order of cost.",
+    "reference_evidence": "We propose an efficient greedy approach, which takes advantage of the EMD flow network topology. This means that a feasible vertex of q can always augment flow to any feasible vertex of p along one edge. Our GreedyUB algorithm (Algorithm 4), for each feasible vertex qi of q, accesses the feasible vertices pj of p in increasing order of ci;j and augments the maximum possible flow along each edge e(qi;pj), until the remaining capacity from qi has been used up.",
+    "source_node_id": "0012",
+    "source_title": "Running Upper Bound",
+    "source_pages": [
+      8,
+      8
+    ]
+  },
+  {
+    "question": "What happens when the size of PL exceeds a specified limit?",
+    "reference_answer": "When the size of PL exceeds a limit, the insertion of candidates into PL is stopped, and the current EMD is refined using PB until it is pruned or becomes a k-NN candidate.",
+    "reference_evidence": "When the size of PL exceeds a limit, we stop inserting candidates into PL and refine the current EMD by PB until it is pruned or becomes a k-NN candidate.",
+    "source_node_id": "0012",
+    "source_title": "Running Upper Bound",
+    "source_pages": [
+      8,
+      8
+    ]
+  },
+  {
+    "question": "What is the memory limit set for DRO in the experiments?",
+    "reference_answer": "The memory limit set for DRO in the experiments is 512MB, and the mechanism to stop inserting candidates into PL was never triggered in the experimental testings.",
+    "reference_evidence": "In all of our experimental testings, this mechanism is never triggered as the size of PL is much smaller than our default memory limit (i.e., 512MB).",
+    "source_node_id": "0012",
+    "source_title": "Running Upper Bound",
+    "source_pages": [
+      8,
+      8
+    ]
+  },
+  {
+    "question": "What is the best EMD computation method according to the results?",
+    "reference_answer": "SIA",
+    "reference_evidence": "SIA is the best method which constantly outperforms its base method SSP and other alternatives (e.g., TRA) by at least 2.4 times.",
+    "source_node_id": "0014",
+    "source_title": "Performance Improvement",
+    "source_pages": [
+      9,
+      10
+    ]
+  },
+  {
+    "question": "Which datasets are used in the evaluation?",
+    "reference_answer": "RETINA, IRMA, FLICKR, PANORAMIO, FRIENDS, and WORLD",
+    "reference_evidence": "We use six real datasets in our evaluation; their default statistics are shown in Table 3.",
+    "source_node_id": "0014",
+    "source_title": "Performance Improvement",
+    "source_pages": [
+      9,
+      10
+    ]
+  },
+  {
+    "question": "What ground distance metric is used in the experiments?",
+    "reference_answer": "Euclidean distance",
+    "reference_evidence": "Similar to [25,30,32], we use Euclidean distance as the ground distance (cost matrix) in all the experiments.",
+    "source_node_id": "0014",
+    "source_title": "Performance Improvement",
+    "source_pages": [
+      9,
+      10
+    ]
+  },
+  {
+    "question": "How does SIA compare to the runner-up method in terms of performance?",
+    "reference_answer": "At least two times faster",
+    "reference_evidence": "SIA is obviously the best module for calculating EMD under the filter-and-refinement framework. Note also that the time spent in the filter phase (in Table 4) is negligible, which confirms our discussion that the refinement phase dominates the runtime of the entire filter-and-refinement framework.",
+    "source_node_id": "0014",
+    "source_title": "Performance Improvement",
+    "source_pages": [
+      9,
+      10
+    ]
+  },
+  {
+    "question": "Which method's performance is very close to the optimal method OI in terms of query time?",
+    "reference_answer": "DRO",
+    "reference_evidence": "Performance of SIA, PB and DRO varying on k",
+    "source_node_id": "0015",
+    "source_title": "Scalability Experiments",
+    "source_pages": [
+      10,
+      11
+    ]
+  },
+  {
+    "question": "How does the number of complete refinements (DRO-C) compare to k?",
+    "reference_answer": "DRO-C is only slightly larger than k",
+    "reference_evidence": "Closeness of PB and DRO to the oracle methods (number of reﬁnements)",
+    "source_node_id": "0015",
+    "source_title": "Scalability Experiments",
+    "source_pages": [
+      10,
+      11
+    ]
+  },
+  {
+    "question": "Which methods scale very well with the database size when k is set to 32?",
+    "reference_answer": "PB and DRO",
+    "reference_evidence": "Scalability to dataset cardinality (number of objects)",
+    "source_node_id": "0015",
+    "source_title": "Scalability Experiments",
+    "source_pages": [
+      10,
+      11
+    ]
+  },
+  {
+    "question": "What is the scalability of SIA, PB, and DRO with respect to histogram dimensionality?",
+    "reference_answer": "They scale well",
+    "reference_evidence": "Scalability to histogram dimensionality",
+    "source_node_id": "0015",
+    "source_title": "Scalability Experiments",
+    "source_pages": [
+      10,
+      11
+    ]
+  },
+  {
+    "question": "What is the scalability behavior of DRO compared to PB and SIA when the dataset size increases?",
+    "reference_answer": "DRO's improvement over PB is stable, and it outperforms SIA, which is sensitive to the number of refinements.",
+    "reference_evidence": "In the first scalability study, we evaluate the effectiveness of our techniques against the dataset cardinality (number of objects). [...] We observe that SIA is quite sensitive to the number of refinements while PB and DRO are likely sensitive to the number of the complete refinements (PB-C and DRO-C). In addition, the improvement of DRO over PB is stable, indicating that the reordering technique is not affected by the increasing number of objects that survive the filters.",
+    "source_node_id": "0016",
+    "source_title": "Parameter Tuning in DRO",
+    "source_pages": [
+      11,
+      12
+    ]
+  },
+  {
+    "question": "What prioritizing function does DRO use, and how does it differ from using just emd-?",
+    "reference_answer": "DRO uses a modified prioritizing function that combines current cost and estimated cost with a tightness factor, rather than just using emd-.",
+    "reference_evidence": "As mentioned in Section 4.4, the running lower bound emd can be used to prioritize objects in DRO. However, as shown in Figure 17(b), emd is not an effective prioritizing function since it does not take the bound tightness into consideration. [...] DRO (in Figure 17(b) and the previous experiments) uses the following prioritizing function, which is a slight modification of emd (Definition 3): (1 - τ) * current cost + τ * estimated cost, where τ indicates the tightness of the running bounds (i.e., emd+ - emd).",
+    "source_node_id": "0016",
+    "source_title": "Parameter Tuning in DRO",
+    "source_pages": [
+      11,
+      12
+    ]
+  }
+]
