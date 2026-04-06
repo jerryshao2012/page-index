@@ -17,8 +17,7 @@ from pageindex.utils import (
     write_node_id,
 )
 
-
-DEFAULT_MODEL = "deepseek-r1:14b"
+DEFAULT_MODEL = "qwen3.5:latest"
 DEFAULT_BASE_URL = "http://localhost:11434/v1"
 DEFAULT_PDF = "tests/pdfs/earthmover.pdf"
 DEFAULT_OUTPUT_DIR = "results/single-doc-demo"
@@ -174,7 +173,7 @@ def extract_json_candidates(text):
         start = normalized.find(opener)
         end = normalized.rfind(closer)
         if start != -1 and end != -1 and end > start:
-            candidates.append(normalized[start : end + 1])
+            candidates.append(normalized[start: end + 1])
     candidates.append(normalized)
     return candidates
 
@@ -518,6 +517,95 @@ def build_markdown_report(pdf_name, model, judge_model, metrics, report_file):
     return "\n".join(content) + "\n"
 
 
+def navigate_index(client, query: str, index_node: dict, depth: int = 0) -> list[dict]:
+    """
+    Recursively navigate the document index using LLM reasoning.
+    Returns list of relevant leaf nodes with page references.
+    """
+    children = index_node.get("children", [])
+    if not children:
+        # Leaf node: return this section as relevant
+        return [index_node]
+    # Ask the LLM which branches are relevant to the query
+    children_summary = "\n".join([
+        f"[{i}] {child['title']}: {child['summary']}"
+        for i, child in enumerate(children)
+    ])
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are navigating a document index to find sections relevant "
+                    "to a query. Select the index numbers of sections that are likely "
+                    "to contain the answer. Return a JSON array of selected indices."
+                )
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Query: {query}\n\n"
+                    f"Available sections:\n{children_summary}\n\n"
+                    f"Which sections should I look into? Return JSON array of indices only."
+                )
+            }
+        ],
+        temperature=0,
+        response_format={"type": "json_object"}
+    )
+    selected = json.loads(response.choices[0].message.content).get("indices", [])
+    relevant_nodes = []
+    for idx in selected:
+        if isinstance(idx, int) and 0 <= idx < len(children):
+            # Recurse into selected branches
+            relevant_nodes.extend(
+                navigate_index(client, query, children[idx], depth + 1)
+            )
+    return relevant_nodes
+
+
+def answer_with_pageindex(client, query: str, index: dict, document_pages: dict) -> str:
+    """
+    Full PageIndex retrieval and answer generation.
+    """
+    # Navigate the index to find relevant sections
+    relevant_nodes = navigate_index(query, index)
+    # Retrieve full text from identified pages
+    context_parts = []
+    citations = []
+    for node in relevant_nodes:
+        pages = node.get("pages", [])
+        if pages:
+            page_start, page_end = pages[0], pages[1]
+            for page_num in range(page_start, page_end + 1):
+                if page_num in document_pages:
+                    context_parts.append(document_pages[page_num])
+                    citations.append(f"p.{page_num}")
+    context = "\n\n".join(context_parts)
+    # Generate answer with full, unchunked context
+    answer_response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Answer the question based on the provided document sections. "
+                    "Be precise. If the answer involves numbers or dates, quote them exactly."
+                )
+            },
+            {
+                "role": "user",
+                "content": f"Document sections:\n{context}\n\nQuestion: {query}"
+            }
+        ],
+        temperature=0
+    )
+    answer = answer_response.choices[0].message.content
+    citation_str = ", ".join(set(citations))
+    return f"{answer}\n\n**Source:** {citation_str}"
+
+
 def main():
     args = parse_args()
 
@@ -604,7 +692,7 @@ def main():
         "hallucination_rate": hallucinations / total if total else 0.0,
     }
     metrics["passes_gate"] = (
-        metrics["accuracy"] >= args.target_accuracy and metrics["hallucination_rate"] == 0.0
+            metrics["accuracy"] >= args.target_accuracy and metrics["hallucination_rate"] == 0.0
     )
 
     report = {
